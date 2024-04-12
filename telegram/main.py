@@ -8,7 +8,7 @@ load_dotenv()
 import logging
 from telegram import Update
 from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler, MessageHandler
-from process import run
+from lib.process import run
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -39,10 +39,10 @@ async def generate(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Verificar si el usuario ya se encuentra registrado
     user = get_user(user_id)
     # get the message that the user sent
-    msg = update.message
+    msg = update.message.text
     if user:
         await context.bot.send_message(chat_id=update.effective_chat.id, text=f"Espera un momento por favor, estamos generando el podcast") 
-        path = run(msg, user_id)
+        path = run(str(msg), str(user_id))
         # read file input
         await context.bot.send_audio(chat_id=update.effective_chat.id, audio=path)
     else:

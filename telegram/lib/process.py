@@ -61,7 +61,10 @@ def separar_por_orador(texto, user_id):
     texto =  texto.split("\n")
     for i in range(len(texto)):
         frase = texto[i].split(":")
-        filename = f"audio{'0'*(5-len(str(i)))}{i}.{audio_format}"
+        # check if folder exists, if not create
+        if not os.path.exists(final_folder + "/" + user_id):
+            os.makedirs(final_folder + "/" + user_id)
+        filename = f"{user_id}/audio{'0'*(5-len(str(i)))}{i}.{audio_format}"
         if "María" in frase[0]:
             texto_a_voz_openai(text_input=frase[1], voice="nova",
                                output_filename=filename)
@@ -106,10 +109,12 @@ def limpiar_carpetas(carpeta_1):
         print("Error al limpiar carpetas:", e)
 
 def run(topic, user_id):
+    if not os.path.exists(final_folder):
+            os.makedirs(final_folder)
     audio_dir = f'{topic}.{audio_format}'
     bullet_list = generate_list(topic)
     script = create_meta_summary(bullet_list)
     separar_por_orador(script, user_id)
-    combinar_audios(os.path.join(final_folder), audio_dir)
+    combinar_audios(os.path.join(final_folder + "/" + user_id), audio_dir)
     limpiar_carpetas(final_folder)
     return audio_dir
